@@ -9,7 +9,6 @@ int main(int argc, char *argv[]) {
 
     memw_init();
 
-
     int r = 5;
     memw_dblock *int_i = memw_alloc(&r, sizeof(int));
 
@@ -20,7 +19,6 @@ int main(int argc, char *argv[]) {
 
 
     memw_destroy();
-
 
 
 
