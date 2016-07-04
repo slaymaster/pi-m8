@@ -14,8 +14,9 @@ int main(int argc, char *argv[]) {
     memw_dblock *int_i = memw_alloc(&r, sizeof(int));
 
 
-    printf("our value is %d", *(int*)int_i->data);
+    printf("our value is %d\n", *(int*)int_i->data);
 
+    memw_dealloc(int_i);
 
 
     memw_destroy();

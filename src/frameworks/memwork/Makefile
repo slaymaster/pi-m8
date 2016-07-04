@@ -1,9 +1,9 @@
 CC=gcc
 CFLAGS=-Wall -g -pedantic -std=gnu99 `pkg-config --cflags glib-2.0`
 LDFLAGS=$(shell pkg-config --libs glib-2.0)
-SOURCES=memwork.c memworker.c list.c
+SOURCES=memwork.c memworker.c
 OBJECTS=$(SOURCES:.c=.o)
-DEPS=memwork.h list.h
+DEPS=memwork.h
 EXECUTABLE=memwork
 
 all: $(SOURCES) $(EXECUTABLE)
