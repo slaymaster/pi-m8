@@ -1,5 +1,6 @@
 #include "pi-m8.h"
 
+GSList *cmd_stack;
 
 int main(int argc, char *argv[]) {
 
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]) {
         // initiate commandfile
     char *cmd_file = argv[1];
     char cmd_buf[25];
+    clear_buf(cmd_buf);
 
 
     // load streams
@@ -32,8 +34,9 @@ int main(int argc, char *argv[]) {
     while (read_cmd(cmd_file, cmd_buf)) {
         // read command log
         printf("reading command log\n");
-        if (cmd_buf != NULL && validate_input(cmd_buf)) {
-            printf("read: %s\n", cmd_buf);
+        if (!ie_cmd()) {
+            char *c = f_cmd();
+            printf("read: %s\n", c);
         }
         // sleep
         sleep(1);
@@ -60,19 +63,34 @@ bool read_cmd(char *cmd_file, char cmd_buf[25]) {
 
     fclose(fp);
 
+    if (validate_input(cmd_buf)) {
+        e_cmd(cmd_buf);
+    }
+
+    clear_buf(cmd_buf);
+
     return true;
+
+}
+
+void clear_buf(char buf[25]) {
+    for (int i = 0; i<25; i++) {
+        buf[i]= '\n';
+    }
 
 }
 
 bool validate_input(char buf[25]) {
 
-    if (strlen(buf) != 25) {
-        return false;
-    } else {
-        return true;
-    }
 
-    return false;
+    for (int i = 0; i<25; i++) {
+       if (buf[i] == '\n') {
+            return false;
+       } 
+    }
+    
+
+    return true;
 }
 
 void parse(char buf[25]) {
@@ -80,3 +98,38 @@ void parse(char buf[25]) {
     // parse input
 
 }
+
+bool e_cmd(char buf[25]) {
+
+
+    memw_dblock *data = memw_alloc(buf, sizeof(char)*25);
+    cmd_stack = g_slist_append(cmd_stack, data);
+
+    return false;
+
+}
+
+void *f_cmd() {
+
+    GSList *head = cmd_stack;
+    cmd_stack = g_slist_remove_link(cmd_stack, head);
+
+    memw_dblock *data = head->data;
+    g_slist_free_1(head);
+
+
+    return data->data;
+}
+
+
+void d_cmd() {
+
+
+}
+
+bool ie_cmd() {
+
+    return cmd_stack == NULL;
+
+}
+
