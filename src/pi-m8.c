@@ -1,6 +1,6 @@
 #include "pi-m8.h"
 
-GSList *cmd_stack;
+GSList *cmd_stack = NULL;
 bool cmd_reader;
 bool cmd_parser;
 
@@ -56,14 +56,16 @@ int main(int argc, char *argv[]) {
         printf("reading command log\n");
         if (!ie_cmd()) {
             char *c = (char*)f_cmd();
-            printf("read: %s\n", c);
+            printf("read: ");
+            fwrite(c, sizeof(char), 25, stdout);
+            printf("\n");
         }
         // sleep
         sleep(1);
     }
 
     pthread_join(*(pthread_t*)cmd_r_thread->data, NULL);
-
+    memw_free_all();
     return 0;
 }
 
@@ -82,7 +84,6 @@ void sighandler(int signum) {
         printf("Caught SIGINT--EXITING\n");
         cmd_reader = false;
         cmd_parser = false;
-        memw_free_all();
     }
 }
 
@@ -170,7 +171,7 @@ void parse(char buf[25]) {
     // parse input
 }
 bool e_cmd(char *buf) {
-    memw_dblock *data = memw_alloc(buf, sizeof(char)*25);
+    memw_dblock *data = memw_alloc(buf, (sizeof(char)*26));
     cmd_stack = g_slist_append(cmd_stack, data);
 
     return false;
