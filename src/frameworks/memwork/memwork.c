@@ -1,5 +1,6 @@
+#ifndef MEMWORK_H
 #include "memwork.h"
-
+#endif
 
 GList *l;
 
