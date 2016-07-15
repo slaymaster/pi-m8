@@ -63,9 +63,8 @@ void init_log() {
     sprintf(uname, "%s %s %s", unameData.sysname, unameData.release, unameData.nodename);
 
     // key
-    char *key = "12345abcde";
     char buf[100];
-    sprintf(buf, "Pi-m8 started on %s, on %s with key %s", datetime, uname, key);
+    sprintf(buf, "Pi-m8 started on %s, on %s with key %s", datetime, uname, id);
 
 
     // check if log file exists

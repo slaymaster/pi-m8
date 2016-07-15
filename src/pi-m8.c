@@ -4,6 +4,7 @@ GSList *cmd_stack = NULL;
 bool cmd_reader;
 bool cmd_parser;
 bool updater_running;
+char *id;
 
 int main(int argc, char *argv[]) {
 
@@ -23,6 +24,8 @@ int main(int argc, char *argv[]) {
         printf("Coudln't init sighant--exiting\n");
         exit(1);
     }
+        // calculate id
+    constr_id();
 
         // initiate controlbools
     cmd_parser = true;
@@ -206,4 +209,10 @@ void d_cmd() {
 bool ie_cmd() {
     return cmd_stack == NULL;
 }
-
+void constr_id() {
+    struct utsname unameData;
+    uname(&unameData);
+    char *node = unameData.nodename;
+    id =  g_compute_checksum_for_string(G_CHECKSUM_SHA512, node, strlen(node));
+    printf("id: %s\n", id);
+}

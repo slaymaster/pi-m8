@@ -28,6 +28,7 @@
 #define EVENT_STARTUP 9
 
 extern int log_num;
+extern char *id;
 
 void init_log();
 void log_event(int event_type, char *event);

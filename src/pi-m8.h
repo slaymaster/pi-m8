@@ -33,3 +33,4 @@ void *f_cmd();
 void d_cmd();
 bool ie_cmd();
 void *updater(void *args);
+void constr_id();
