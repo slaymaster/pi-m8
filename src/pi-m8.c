@@ -3,14 +3,13 @@
 GSList *cmd_stack = NULL;
 bool cmd_reader;
 bool cmd_parser;
+bool updater_running;
 
 int main(int argc, char *argv[]) {
-
 
     if (argc < 2) {
         exit(0);
     }
-
 
     // needed frameworks:
     // memory-framework
@@ -25,18 +24,20 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+        // initiate controlbools
     cmd_parser = true;
+    updater_running = true;
 
     // initiate modules
         // initiate commandfile
     char *cmd_file = argv[1];
     char cmd_buf[25];
     clear_buf(cmd_buf);
-
+        // initiate secretary
+    init_log();
 
     // load streams
     
-
     // launch worker threads
         // launch command reader
             // create arr containing cmd_pipe and cmd_buf
@@ -48,6 +49,10 @@ int main(int argc, char *argv[]) {
     cmd_reader = true; 
     memw_dblock *cmd_r_thread = run(read_pipe, args);
     printf("MASTER: Dispatched cmd_reader!\n");
+    
+        // launch updater
+    memw_dblock *updater_r_thread = run(updater, NULL);
+    printf("MASTER: Dispatched updater!\n");
 
     // go into standby
 
@@ -59,12 +64,16 @@ int main(int argc, char *argv[]) {
             printf("read: ");
             fwrite(c, sizeof(char), 25, stdout);
             printf("\n");
+            char fs[32];
+            sprintf(fs, "Received command: %s", c);
+            log_event(EVENT_GENERAL, fs);
         }
         // sleep
         sleep(1);
     }
 
     pthread_join(*(pthread_t*)cmd_r_thread->data, NULL);
+    pthread_join(*(pthread_t*)updater_r_thread->data, NULL);
     memw_free_all();
     return 0;
 }
@@ -84,6 +93,7 @@ void sighandler(int signum) {
         printf("Caught SIGINT--EXITING\n");
         cmd_reader = false;
         cmd_parser = false;
+        updater_running = false;
     }
 }
 
@@ -130,12 +140,9 @@ void *read_pipe(void *args) {
     memcpy(cmd_buf, &argu[cmd_f_l+1], 25);
    
     //printf("THREAD: attempting to pipe %s, with len %d\n", cmd_pipe, cmd_f_l);
-
-
-
     int fd;
 
-    fd = open(cmd_pipe, O_RDONLY);
+    fd = open(cmd_pipe, O_RDONLY | O_NONBLOCK);
     //printf("THREAD: opened pipe\n");
     if (fd == -1) {
         return NULL;
@@ -152,6 +159,14 @@ void *read_pipe(void *args) {
     }
 
     close(fd);
+    return NULL;
+}
+void *updater(void *args) {
+
+    while (updater_running) {
+        synchronise(NULL);
+        sleep(5);
+    }
     return NULL;
 }
 void clear_buf(char buf[25]) {

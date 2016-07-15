@@ -7,13 +7,17 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
+#include "modules/secretary/secretary.h"
 
 #ifndef MEMWORK_H
 #define MEMWORK_H
 #include "frameworks/memwork/memwork.h"
 #endif
 
+#ifndef THREADWORK_H
+#define THREADWORK_H
 #include "frameworks/threadwork/threadwork.h"
+#endif
 
 extern GSList *cmd_stack;
 
@@ -28,3 +32,4 @@ bool e_cmd(char *buf);
 void *f_cmd();
 void d_cmd();
 bool ie_cmd();
+void *updater(void *args);
