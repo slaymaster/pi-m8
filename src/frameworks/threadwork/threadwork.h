@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <glib.h>
 
 #ifndef MEMWORK_H
 #define MEMWORK_H

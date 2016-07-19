@@ -19,7 +19,12 @@
 #include "frameworks/threadwork/threadwork.h"
 #endif
 
+#define NUM_THREADS 2
+#define CMD_THREAD 0
+#define UPDATE_THREAD 1
+
 extern GSList *cmd_stack;
+extern GHashTable *thread_table;
 
 bool init_sighant();
 void sighandler(int signum);

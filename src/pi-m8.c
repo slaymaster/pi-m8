@@ -1,6 +1,7 @@
 #include "pi-m8.h"
 
 GSList *cmd_stack = NULL;
+memw_dblock *thread_list[NUM_THREADS];
 bool cmd_reader;
 bool cmd_parser;
 bool updater_running;
@@ -51,10 +52,14 @@ int main(int argc, char *argv[]) {
     memcpy(&args[strlen(cmd_file)+1], cmd_buf, 25);
     cmd_reader = true; 
     memw_dblock *cmd_r_thread = run(read_pipe, args);
+
+    // add thread to thread table
+    thread_list[CMD_THREAD] = cmd_r_thread;
     printf("MASTER: Dispatched cmd_reader!\n");
     
         // launch updater
     memw_dblock *updater_r_thread = run(updater, NULL);
+    thread_list[UPDATE_THREAD] = updater_r_thread;
     printf("MASTER: Dispatched updater!\n");
 
     // go into standby
@@ -75,8 +80,8 @@ int main(int argc, char *argv[]) {
         sleep(1);
     }
 
-    pthread_join(*(pthread_t*)cmd_r_thread->data, NULL);
-    pthread_join(*(pthread_t*)updater_r_thread->data, NULL);
+    pthread_join(*(pthread_t*)thread_list[CMD_THREAD]->data, NULL);
+    pthread_join(*(pthread_t*)thread_list[UPDATE_THREAD]->data, NULL);
     memw_free_all();
     return 0;
 }
